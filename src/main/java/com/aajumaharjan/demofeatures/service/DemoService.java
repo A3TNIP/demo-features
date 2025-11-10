@@ -1,4 +1,4 @@
-package com.aajumaharjan.demofeatures;
+package com.aajumaharjan.demofeatures.service;
 
 
 import org.springframework.stereotype.Service;
