@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 
 @Configuration
@@ -23,7 +24,8 @@ public class AsyncMessagingConfiguration {
                                                      ObjectProvider<ConnectionFactory> connectionFactoryProvider,
                                                      ObjectProvider<RabbitAdmin> rabbitAdminProvider,
                                                      ObjectProvider<KafkaTemplate<String, String>> kafkaTemplateProvider,
-                                                     ObjectProvider<ConsumerFactory<String, String>> consumerFactoryProvider) {
+                                                     ObjectProvider<ConsumerFactory<String, String>> consumerFactoryProvider,
+                                                     ObjectProvider<KafkaAdmin> kafkaAdminProvider) {
         if (properties.getClientClass() != null && !properties.getClientClass().isBlank()) {
             return instantiateCustomClient(properties.getClientClass(), properties.getEndpoint());
         }
@@ -32,7 +34,7 @@ public class AsyncMessagingConfiguration {
             case LOGGING -> new LoggingAsyncMessagingClient("logging", properties.getEndpoint());
             case NOOP -> new NoopAsyncMessagingClient();
             case RABBITMQ -> createRabbit(rabbitTemplateProvider, connectionFactoryProvider, rabbitAdminProvider, properties.getEndpoint());
-            case KAFKA -> createKafka(kafkaTemplateProvider, consumerFactoryProvider);
+            case KAFKA -> createKafka(kafkaTemplateProvider, consumerFactoryProvider, kafkaAdminProvider);
         };
     }
 
@@ -72,13 +74,15 @@ public class AsyncMessagingConfiguration {
     }
 
     private AsyncMessagingClient createKafka(ObjectProvider<KafkaTemplate<String, String>> kafkaTemplateProvider,
-                                             ObjectProvider<ConsumerFactory<String, String>> consumerFactoryProvider) {
+                                             ObjectProvider<ConsumerFactory<String, String>> consumerFactoryProvider,
+                                             ObjectProvider<KafkaAdmin> kafkaAdminProvider) {
         KafkaTemplate<String, String> template = kafkaTemplateProvider.getIfAvailable();
         ConsumerFactory<String, String> cf = consumerFactoryProvider.getIfAvailable();
+        KafkaAdmin admin = kafkaAdminProvider.getIfAvailable();
         if (template == null || cf == null) {
             log.warn("Kafka requested but KafkaTemplate/ConsumerFactory not available; falling back to logging client");
             return new LoggingAsyncMessagingClient("kafka-missing", "default");
         }
-        return new KafkaAsyncMessagingClient(template, cf);
+        return new KafkaAsyncMessagingClient(template, cf, admin);
     }
 }
