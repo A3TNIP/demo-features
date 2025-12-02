@@ -19,13 +19,8 @@ public class SecurityBean {
     @Bean
     public PasswordEncoder encoder(){
         if (authProperties.getPassword().getEncoder() == AuthProperties.Password.Encoder.PBKDF2) {
-            // Use explicit PBKDF2 settings to avoid deprecated/removed no-arg constructor
-            return new Pbkdf2PasswordEncoder(
-                    "",
-                    185000,
-                    256,
-                    Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256
-            );
+            // Use Spring's vetted defaults for PBKDF2 to avoid platform-specific issues
+            return Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
         }
         return new BCryptPasswordEncoder();
     }
