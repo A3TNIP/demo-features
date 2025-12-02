@@ -1,6 +1,7 @@
 package com.aajumaharjan.demofeatures.async;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
@@ -9,8 +10,8 @@ import org.springframework.kafka.listener.MessageListener;
 
 import java.util.function.Consumer;
 
-@Slf4j
 public class KafkaAsyncMessagingClient implements AsyncMessagingClient {
+    private static final Logger log = LoggerFactory.getLogger(KafkaAsyncMessagingClient.class);
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ConsumerFactory<String, String> consumerFactory;
 

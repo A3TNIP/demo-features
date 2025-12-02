@@ -1,11 +1,12 @@
 package com.aajumaharjan.demofeatures.async;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 
-@Slf4j
 public class LoggingAsyncMessagingClient implements AsyncMessagingClient {
+    private static final Logger log = LoggerFactory.getLogger(LoggingAsyncMessagingClient.class);
     private final String backend;
     private final String endpoint;
 

@@ -1,6 +1,7 @@
 package com.aajumaharjan.demofeatures.async;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -10,8 +11,8 @@ import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-@Slf4j
 public class RabbitAsyncMessagingClient implements AsyncMessagingClient {
+    private static final Logger log = LoggerFactory.getLogger(RabbitAsyncMessagingClient.class);
     private final RabbitTemplate rabbitTemplate;
     private final ConnectionFactory connectionFactory;
 
