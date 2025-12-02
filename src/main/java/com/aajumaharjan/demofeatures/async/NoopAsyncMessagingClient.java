@@ -4,12 +4,12 @@ import java.util.function.Consumer;
 
 public class NoopAsyncMessagingClient implements AsyncMessagingClient {
     @Override
-    public void publish(String destination, String payload) {
+    public void publish(String destination, Object payload) {
         // intentionally no-op
     }
 
     @Override
-    public void registerListener(String destination, Consumer<String> handler) {
+    public <T> void registerListener(String destination, Class<T> type, Consumer<T> handler) {
         // intentionally no-op
     }
 }

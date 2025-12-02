@@ -1,5 +1,6 @@
 package com.aajumaharjan.demofeatures.async;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,6 +8,7 @@ import java.util.function.Consumer;
 
 public class LoggingAsyncMessagingClient implements AsyncMessagingClient {
     private static final Logger log = LoggerFactory.getLogger(LoggingAsyncMessagingClient.class);
+    private static final ObjectMapper mapper = new ObjectMapper();
     private final String backend;
     private final String endpoint;
 
@@ -16,14 +18,22 @@ public class LoggingAsyncMessagingClient implements AsyncMessagingClient {
     }
 
     @Override
-    public void publish(String destination, String payload) {
-        log.info("[async:{}:{}] publish -> destination='{}' payload='{}'", backend, endpoint, destination, payload);
+    public void publish(String destination, Object payload) {
+        log.info("[async:{}:{}] publish -> destination='{}' payload='{}'", backend, endpoint, destination, safeJson(payload));
     }
 
     @Override
-    public void registerListener(String destination, Consumer<String> handler) {
+    public <T> void registerListener(String destination, Class<T> type, Consumer<T> handler) {
         log.info("[async:{}:{}] registerListener -> destination='{}' (logging stub)", backend, endpoint, destination);
         // simulate receipt
-        handler.accept("mock-message-from-" + destination);
+        handler.accept(type.cast(safeJson("mock-message-from-" + destination)));
+    }
+
+    private Object safeJson(Object o) {
+        try {
+            return mapper.writeValueAsString(o);
+        } catch (Exception e) {
+            return String.valueOf(o);
+        }
     }
 }
