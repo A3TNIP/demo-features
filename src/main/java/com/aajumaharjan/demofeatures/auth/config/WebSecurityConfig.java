@@ -1,5 +1,6 @@
 package com.aajumaharjan.demofeatures.auth.config;
 
+import com.aajumaharjan.demofeatures.auth.AuthProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -17,19 +19,34 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class WebSecurityConfig {
     private final UnauthorizedEntryPoint unauthorizedEntryPoint;
+    private final AuthProperties authProperties;
+    private final TokenProvider tokenProvider;
+    private final UserDetailsService userDetailsService;
 
-    public WebSecurityConfig(UnauthorizedEntryPoint unauthorizedEntryPoint) {
+    public WebSecurityConfig(UnauthorizedEntryPoint unauthorizedEntryPoint,
+                             AuthProperties authProperties,
+                             TokenProvider tokenProvider,
+                             UserDetailsService userDetailsService) {
         this.unauthorizedEntryPoint = unauthorizedEntryPoint;
+        this.authProperties = authProperties;
+        this.tokenProvider = tokenProvider;
+        this.userDetailsService = userDetailsService;
     }
 
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        SessionCreationPolicy sessionPolicy = authProperties.getType() == com.aajumaharjan.demofeatures.auth.AuthProperties.Type.STATEFUL
+                ? SessionCreationPolicy.IF_REQUIRED
+                : SessionCreationPolicy.STATELESS;
+
+        String[] openRoutes = authProperties.getPublicRoutes().toArray(new String[0]);
+
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .exceptionHandling((exception) -> exception.authenticationEntryPoint(unauthorizedEntryPoint))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(sessionPolicy))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(openRoutes).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -44,6 +61,6 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter authenticationTokenFilterBean() {
-        return new JwtAuthenticationFilter();
+        return new JwtAuthenticationFilter(authProperties, userDetailsService, tokenProvider, unauthorizedEntryPoint);
     }
 }

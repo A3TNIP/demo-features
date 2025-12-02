@@ -1,15 +1,13 @@
 package com.aajumaharjan.demofeatures.auth.config;
 
 
+import com.aajumaharjan.demofeatures.auth.AuthProperties;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
-import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,29 +21,29 @@ import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Value("${jwt.header.string}")
-    public String HEADER_STRING;
+    private final AuthProperties properties;
+    private final UserDetailsService userDetailsService;
+    private final TokenProvider jwtTokenUtil;
+    private final UnauthorizedEntryPoint unauthorizedEntryPoint;
 
-    @Value("${jwt.token.prefix}")
-    public String TOKEN_PREFIX;
-
-    @Resource(name = "userService")
-    private UserDetailsService userDetailsService;
-
-    @Autowired
-    private TokenProvider jwtTokenUtil;
-
-    @Autowired
-    private UnauthorizedEntryPoint unauthorizedEntryPoint;
+    public JwtAuthenticationFilter(AuthProperties properties,
+                                   UserDetailsService userDetailsService,
+                                   TokenProvider jwtTokenUtil,
+                                   UnauthorizedEntryPoint unauthorizedEntryPoint) {
+        this.properties = properties;
+        this.userDetailsService = userDetailsService;
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.unauthorizedEntryPoint = unauthorizedEntryPoint;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws IOException, ServletException {
-        String header = req.getHeader(HEADER_STRING);
+        String header = req.getHeader(properties.getJwt().getHeaderString());
         String username = null;
         String authToken = null;
-        if (header != null && header.startsWith(TOKEN_PREFIX)) {
-            authToken = header.replace(TOKEN_PREFIX, "").trim();
+        if (header != null && header.startsWith(properties.getJwt().getTokenPrefix())) {
+            authToken = header.replace(properties.getJwt().getTokenPrefix(), "").trim();
             try {
                 username = jwtTokenUtil.getUsernameFromToken(authToken);
             } catch (IllegalArgumentException e) {

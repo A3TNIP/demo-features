@@ -8,6 +8,9 @@ public class RegisterDto {
     private String password;
     private List<String> roles;
 
+    public RegisterDto() {
+    }
+
     public String getName() {
         return name;
     }
