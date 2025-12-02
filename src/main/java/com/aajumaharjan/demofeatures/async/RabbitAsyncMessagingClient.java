@@ -66,4 +66,24 @@ public class RabbitAsyncMessagingClient implements AsyncMessagingClient {
         }
         rabbitAdmin.declareQueue(new Queue(destination, true));
     }
+
+    @Override
+    public String serialize(Object payload) {
+        try {
+            return mapper.writeValueAsString(payload);
+        } catch (Exception e) {
+            log.warn("Failed to serialize payload {}, sending as string: {}", payload, e.getMessage());
+            return String.valueOf(payload);
+        }
+    }
+
+    @Override
+    public <T> T deserialize(String json, Class<T> type) {
+        try {
+            return mapper.readValue(json, type);
+        } catch (Exception e) {
+            log.warn("Failed to deserialize message to {}: {}", type.getSimpleName(), e.getMessage());
+            return type.cast(json);
+        }
+    }
 }

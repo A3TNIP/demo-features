@@ -38,7 +38,7 @@ public class KafkaAsyncMessagingClient implements AsyncMessagingClient {
         log.info("Kafka listener started for topic {}", destination);
     }
 
-    private String serialize(Object payload) {
+    public String serialize(Object payload) {
         try {
             return mapper.writeValueAsString(payload);
         } catch (Exception e) {
@@ -47,7 +47,7 @@ public class KafkaAsyncMessagingClient implements AsyncMessagingClient {
         }
     }
 
-    private <T> T deserialize(String json, Class<T> type) {
+    public <T> T deserialize(String json, Class<T> type) {
         try {
             return mapper.readValue(json, type);
         } catch (Exception e) {

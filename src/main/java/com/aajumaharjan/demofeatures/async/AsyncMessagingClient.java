@@ -19,4 +19,8 @@ public interface AsyncMessagingClient {
     default void registerListener(String destination, Consumer<Object> handler) {
         registerListener(destination, Object.class, handler);
     }
+
+    String serialize(Object payload);
+
+    <T> T deserialize(String json, Class<T> type);
 }
