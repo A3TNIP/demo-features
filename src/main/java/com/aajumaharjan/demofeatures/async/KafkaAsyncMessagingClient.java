@@ -11,14 +11,14 @@ import org.springframework.kafka.listener.MessageListener;
 
 import java.util.function.Consumer;
 
-public class KafkaAsyncMessagingClient implements AsyncMessagingClient {
+public class KafkaAsyncMessagingClient extends AbstractAsyncMessagingClient implements AsyncMessagingClient {
     private static final Logger log = LoggerFactory.getLogger(KafkaAsyncMessagingClient.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ConsumerFactory<String, String> consumerFactory;
 
     public KafkaAsyncMessagingClient(KafkaTemplate<String, String> kafkaTemplate,
                                      ConsumerFactory<String, String> consumerFactory) {
+                                        super();
         this.kafkaTemplate = kafkaTemplate;
         this.consumerFactory = consumerFactory;
     }
@@ -38,21 +38,4 @@ public class KafkaAsyncMessagingClient implements AsyncMessagingClient {
         log.info("Kafka listener started for topic {}", destination);
     }
 
-    public String serialize(Object payload) {
-        try {
-            return mapper.writeValueAsString(payload);
-        } catch (Exception e) {
-            log.warn("Failed to serialize payload {}, sending as string: {}", payload, e.getMessage());
-            return String.valueOf(payload);
-        }
-    }
-
-    public <T> T deserialize(String json, Class<T> type) {
-        try {
-            return mapper.readValue(json, type);
-        } catch (Exception e) {
-            log.warn("Failed to deserialize message to {}: {}", type.getSimpleName(), e.getMessage());
-            return type.cast(json);
-        }
-    }
 }

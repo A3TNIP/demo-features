@@ -15,15 +15,15 @@ import org.springframework.amqp.support.converter.MessageConverter;
 
 import java.util.function.Consumer;
 
-public class RabbitAsyncMessagingClient implements AsyncMessagingClient {
+public class RabbitAsyncMessagingClient extends AbstractAsyncMessagingClient implements AsyncMessagingClient {
     private static final Logger log = LoggerFactory.getLogger(RabbitAsyncMessagingClient.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
     private final RabbitTemplate rabbitTemplate;
     private final ConnectionFactory connectionFactory;
     private final RabbitAdmin rabbitAdmin;
     private final MessageConverter messageConverter = new Jackson2JsonMessageConverter(mapper);
 
     public RabbitAsyncMessagingClient(RabbitTemplate rabbitTemplate, ConnectionFactory connectionFactory, RabbitAdmin rabbitAdmin) {
+        super();
         this.rabbitTemplate = rabbitTemplate;
         this.connectionFactory = connectionFactory;
         this.rabbitAdmin = rabbitAdmin;
@@ -67,23 +67,4 @@ public class RabbitAsyncMessagingClient implements AsyncMessagingClient {
         rabbitAdmin.declareQueue(new Queue(destination, true));
     }
 
-    @Override
-    public String serialize(Object payload) {
-        try {
-            return mapper.writeValueAsString(payload);
-        } catch (Exception e) {
-            log.warn("Failed to serialize payload {}, sending as string: {}", payload, e.getMessage());
-            return String.valueOf(payload);
-        }
-    }
-
-    @Override
-    public <T> T deserialize(String json, Class<T> type) {
-        try {
-            return mapper.readValue(json, type);
-        } catch (Exception e) {
-            log.warn("Failed to deserialize message to {}: {}", type.getSimpleName(), e.getMessage());
-            return type.cast(json);
-        }
-    }
 }

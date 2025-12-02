@@ -1,18 +1,17 @@
 package com.aajumaharjan.demofeatures.async;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 
-public class LoggingAsyncMessagingClient implements AsyncMessagingClient {
+public class LoggingAsyncMessagingClient extends AbstractAsyncMessagingClient implements AsyncMessagingClient {
     private static final Logger log = LoggerFactory.getLogger(LoggingAsyncMessagingClient.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
     private final String backend;
     private final String endpoint;
 
     public LoggingAsyncMessagingClient(String backend, String endpoint) {
+        super();
         this.backend = backend;
         this.endpoint = endpoint;
     }
@@ -37,23 +36,4 @@ public class LoggingAsyncMessagingClient implements AsyncMessagingClient {
         }
     }
 
-    @Override
-    public String serialize(Object payload) {
-        try {
-            return mapper.writeValueAsString(payload);
-        } catch (Exception e) {
-            log.warn("Failed to serialize payload {}, sending as string: {}", payload, e.getMessage());
-            return String.valueOf(payload);
-        }
-    }
-
-    @Override
-    public <T> T deserialize(String json, Class<T> type) {
-        try {
-            return mapper.readValue(json, type);
-        } catch (Exception e) {
-            log.warn("Failed to deserialize message to {}: {}", type.getSimpleName(), e.getMessage());
-            return type.cast(json);
-        }
-    }
 }
