@@ -59,6 +59,7 @@ public class WebSecurityConfig {
             httpConfigured
             .authorizeHttpRequests((autorize) -> autorize
                         .requestMatchers(openRoutes).permitAll()
+                        .requestMatchers(loginPage, loginPage + "/**").permitAll()
                         .anyRequest().authenticated())
                     .formLogin(login -> login.loginPage(loginPage).permitAll())
                     .httpBasic(Customizer.withDefaults())
