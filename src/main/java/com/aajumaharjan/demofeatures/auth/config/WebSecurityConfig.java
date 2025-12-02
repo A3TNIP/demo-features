@@ -13,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.Customizer;
 
 @Configuration
 @EnableWebSecurity
@@ -41,15 +42,26 @@ public class WebSecurityConfig {
 
         String[] openRoutes = authProperties.getPublicRoutes().toArray(new String[0]);
 
-        return http.csrf(AbstractHttpConfigurer::disable)
+        var httpConfigured = http.csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .exceptionHandling((exception) -> exception.authenticationEntryPoint(unauthorizedEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(sessionPolicy))
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(openRoutes).permitAll()
-                        .anyRequest().authenticated())
-                .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
-                .build();
+                        .anyRequest().authenticated());
+
+        // Only add JWT bearer filter in stateless mode
+        if (sessionPolicy == SessionCreationPolicy.STATELESS) {
+            httpConfigured.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+        } else {
+            // Stateful mode: use standard session-based auth mechanisms
+            httpConfigured
+                    .formLogin(Customizer.withDefaults())
+                    .httpBasic(Customizer.withDefaults())
+                    .logout(Customizer.withDefaults());
+        }
+
+        return httpConfigured.build();
     }
 
 
