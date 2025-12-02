@@ -46,14 +46,15 @@ public class WebSecurityConfig {
         var httpConfigured = http.csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .exceptionHandling((exception) -> exception.authenticationEntryPoint(unauthorizedEntryPoint))
-                .sessionManagement(session -> session.sessionCreationPolicy(sessionPolicy))
-                .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(openRoutes).permitAll()
-                        .anyRequest().authenticated());
+                .sessionManagement(session -> session.sessionCreationPolicy(sessionPolicy));
 
         // Only add JWT bearer filter in stateless mode
         if (sessionPolicy == SessionCreationPolicy.STATELESS) {
-            httpConfigured.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+            httpConfigured
+            .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers(openRoutes).permitAll()
+                        .anyRequest().authenticated())
+            .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
         } else {
             // Stateful mode: use standard session-based auth mechanisms
             httpConfigured
