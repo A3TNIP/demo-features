@@ -2,8 +2,6 @@ package com.aajumaharjan.demofeatures.auth.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,8 +11,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Getter
-@Setter
 public class UserEntity extends BaseEntity implements UserDetails {
     private String password;
     private String email;
@@ -34,8 +30,33 @@ public class UserEntity extends BaseEntity implements UserDetails {
     }
 
     @Override
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
     public String getUsername() {
         return this.email;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     @Override

@@ -50,10 +50,10 @@ public class AuthService {
 
         final String token = tokenProvider.generateToken(authentication);
 
-        var authResponse = AuthResponse.builder()
-                .token(token)
-                .roles(roles.stream().map(role -> "ROLE_" + role.getName().replace(" ", "_").toUpperCase()).toList())
-                .build();
+        var roleNames = roles.stream()
+                .map(role -> "ROLE_" + role.getName().replace(" ", "_").toUpperCase())
+                .toList();
+        var authResponse = new AuthResponse(token, roleNames);
 
         return ResponseEntity.ok(authResponse);
     }
