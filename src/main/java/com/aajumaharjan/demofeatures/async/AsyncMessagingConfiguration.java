@@ -3,6 +3,7 @@ package com.aajumaharjan.demofeatures.async;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -20,6 +21,7 @@ public class AsyncMessagingConfiguration {
     public AsyncMessagingClient asyncMessagingClient(AsyncProperties properties,
                                                      ObjectProvider<RabbitTemplate> rabbitTemplateProvider,
                                                      ObjectProvider<ConnectionFactory> connectionFactoryProvider,
+                                                     ObjectProvider<RabbitAdmin> rabbitAdminProvider,
                                                      ObjectProvider<KafkaTemplate<String, String>> kafkaTemplateProvider,
                                                      ObjectProvider<ConsumerFactory<String, String>> consumerFactoryProvider) {
         if (properties.getClientClass() != null && !properties.getClientClass().isBlank()) {
@@ -29,7 +31,7 @@ public class AsyncMessagingConfiguration {
         return switch (properties.getProvider()) {
             case LOGGING -> new LoggingAsyncMessagingClient("logging", properties.getEndpoint());
             case NOOP -> new NoopAsyncMessagingClient();
-            case RABBITMQ -> createRabbit(rabbitTemplateProvider, connectionFactoryProvider, properties.getEndpoint());
+            case RABBITMQ -> createRabbit(rabbitTemplateProvider, connectionFactoryProvider, rabbitAdminProvider, properties.getEndpoint());
             case KAFKA -> createKafka(kafkaTemplateProvider, consumerFactoryProvider);
         };
     }
@@ -54,14 +56,19 @@ public class AsyncMessagingConfiguration {
 
     private AsyncMessagingClient createRabbit(ObjectProvider<RabbitTemplate> rabbitTemplateProvider,
                                               ObjectProvider<ConnectionFactory> connectionFactoryProvider,
+                                              ObjectProvider<RabbitAdmin> rabbitAdminProvider,
                                               String endpoint) {
         RabbitTemplate template = rabbitTemplateProvider.getIfAvailable();
         ConnectionFactory cf = connectionFactoryProvider.getIfAvailable();
+        RabbitAdmin admin = rabbitAdminProvider.getIfAvailable();
         if (template == null || cf == null) {
             log.warn("RabbitMQ requested but RabbitTemplate/ConnectionFactory not available; falling back to logging client");
             return new LoggingAsyncMessagingClient("rabbitmq-missing", endpoint);
         }
-        return new RabbitAsyncMessagingClient(template, cf);
+        if (admin == null && template != null) {
+            admin = new RabbitAdmin(template);
+        }
+        return new RabbitAsyncMessagingClient(template, cf, admin);
     }
 
     private AsyncMessagingClient createKafka(ObjectProvider<KafkaTemplate<String, String>> kafkaTemplateProvider,
