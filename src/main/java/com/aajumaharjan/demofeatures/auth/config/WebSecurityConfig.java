@@ -41,6 +41,7 @@ public class WebSecurityConfig {
                 : SessionCreationPolicy.STATELESS;
 
         String[] openRoutes = authProperties.getPublicRoutes().toArray(new String[0]);
+        String loginPage = "/login";
 
         var httpConfigured = http.csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
@@ -56,7 +57,10 @@ public class WebSecurityConfig {
         } else {
             // Stateful mode: use standard session-based auth mechanisms
             httpConfigured
-                    .formLogin(Customizer.withDefaults())
+            .authorizeHttpRequests((autorize) -> autorize
+                        .requestMatchers(openRoutes).permitAll()
+                        .anyRequest().authenticated())
+                    .formLogin(login -> login.loginPage(loginPage).permitAll())
                     .httpBasic(Customizer.withDefaults())
                     .logout(Customizer.withDefaults());
         }
