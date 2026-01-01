@@ -45,6 +45,9 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public UserEntity register(RegisterDto registerDto) {
+        if (userRepository.findByEmail(registerDto.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("User with email " + registerDto.getEmail() + " already exists");
+        }
         var password = passwordEncoder.encode(registerDto.getPassword());
 
         UserEntity user = new UserEntity();
