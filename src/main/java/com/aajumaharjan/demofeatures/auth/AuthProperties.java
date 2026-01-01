@@ -109,7 +109,8 @@ public class AuthProperties {
     public static class Password {
         public enum Encoder {BCRYPT, PBKDF2}
 
-        private Encoder encoder = Encoder.BCRYPT;
+        @Value("${plugins.demo-features.auth.password.encoder:BCRYPT}")
+        private Encoder encoder;
 
         public Encoder getEncoder() {
             return encoder;
