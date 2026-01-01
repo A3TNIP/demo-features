@@ -54,55 +54,139 @@ public class AuthProperties {
     }
 
     public static class Jwt {
-        @Value("${plugins.demo-features.auth.jwt.token.validity}")
-        private long tokenValidity;
-        @Value("${plugins.demo-features.auth.jwt.signing.key}")
-        private String signingKey;
-        @Value("${plugins.demo-features.auth.jwt.authorities.key}")
-        private String authoritiesKey;
-        @Value("${plugins.demo-features.auth.jwt.token.prefix}")
-        private String tokenPrefix;
-        @Value("${plugins.demo-features.auth.jwt.header.string}")
-        private String headerString;
+        private Token token = new Token();
+        private Signing signing = new Signing();
+        private Authorities authorities = new Authorities();
+        private Header header = new Header();
 
+        public Token getToken() {
+            return token;
+        }
+
+        public void setToken(Token token) {
+            this.token = token;
+        }
+
+        public Signing getSigning() {
+            return signing;
+        }
+
+        public void setSigning(Signing signing) {
+            this.signing = signing;
+        }
+
+        public Authorities getAuthorities() {
+            return authorities;
+        }
+
+        public void setAuthorities(Authorities authorities) {
+            this.authorities = authorities;
+        }
+
+        public Header getHeader() {
+            return header;
+        }
+
+        public void setHeader(Header header) {
+            this.header = header;
+        }
+
+        // Convenience accessors so existing callers keep working
         public long getTokenValidity() {
-            return tokenValidity;
+            return token.getValidity();
         }
 
         public void setTokenValidity(long tokenValidity) {
-            this.tokenValidity = tokenValidity;
+            token.setValidity(tokenValidity);
         }
 
         public String getSigningKey() {
-            return signingKey;
+            return signing.getKey();
         }
 
         public void setSigningKey(String signingKey) {
-            this.signingKey = signingKey;
+            signing.setKey(signingKey);
         }
 
         public String getAuthoritiesKey() {
-            return authoritiesKey;
+            return authorities.getKey();
         }
 
         public void setAuthoritiesKey(String authoritiesKey) {
-            this.authoritiesKey = authoritiesKey;
+            authorities.setKey(authoritiesKey);
         }
 
         public String getTokenPrefix() {
-            return tokenPrefix;
+            return token.getPrefix();
         }
 
         public void setTokenPrefix(String tokenPrefix) {
-            this.tokenPrefix = tokenPrefix;
+            token.setPrefix(tokenPrefix);
         }
 
         public String getHeaderString() {
-            return headerString;
+            return header.getString();
         }
 
         public void setHeaderString(String headerString) {
-            this.headerString = headerString;
+            header.setString(headerString);
+        }
+
+        public static class Token {
+            private long validity;
+            private String prefix;
+
+            public long getValidity() {
+                return validity;
+            }
+
+            public void setValidity(long validity) {
+                this.validity = validity;
+            }
+
+            public String getPrefix() {
+                return prefix;
+            }
+
+            public void setPrefix(String prefix) {
+                this.prefix = prefix;
+            }
+        }
+
+        public static class Signing {
+            private String key;
+
+            public String getKey() {
+                return key;
+            }
+
+            public void setKey(String key) {
+                this.key = key;
+            }
+        }
+
+        public static class Authorities {
+            private String key;
+
+            public String getKey() {
+                return key;
+            }
+
+            public void setKey(String key) {
+                this.key = key;
+            }
+        }
+
+        public static class Header {
+            private String string;
+
+            public String getString() {
+                return string;
+            }
+
+            public void setString(String string) {
+                this.string = string;
+            }
         }
     }
 
