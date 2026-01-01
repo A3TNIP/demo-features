@@ -9,10 +9,10 @@ import java.util.List;
 @ConfigurationProperties(prefix = "plugins.demo-features.auth")
 public class AuthProperties {
 
-    private Jwt jwt = new Jwt();
-    private Type type = Type.STATELESS;
-    private Password password = new Password();
-    private List<String> publicRoutes = new ArrayList<>(List.of("/auth/**"));
+    private Jwt jwt;
+    private Type type;
+    private Password password;
+    private List<String> publicRoutes;
 
     public Jwt getJwt() {
         return jwt;
@@ -51,11 +51,11 @@ public class AuthProperties {
     }
 
     public static class Jwt {
-        private long tokenValidity = 18000;
-        private String signingKey = "lecSQFIERRoVz/AOV1LtEEp3nAvy65naUOYX//rbdHeB2BE/7uiGplCLgDhS3aJTb5vPQV8TtIHrbJqcSEraEw==";
-        private String authoritiesKey = "roles";
-        private String tokenPrefix = "Bearer";
-        private String headerString = "Authorization";
+        private long tokenValidity;
+        private String signingKey;
+        private String authoritiesKey;
+        private String tokenPrefix;
+        private String headerString;
 
         public long getTokenValidity() {
             return tokenValidity;
