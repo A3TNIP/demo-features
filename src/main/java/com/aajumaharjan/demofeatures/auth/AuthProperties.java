@@ -1,5 +1,6 @@
 package com.aajumaharjan.demofeatures.auth;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.ArrayList;
@@ -9,9 +10,13 @@ import java.util.List;
 @ConfigurationProperties(prefix = "plugins.demo-features.auth")
 public class AuthProperties {
 
+    @Value("${plugins.demo-features.auth.jwt}")
     private Jwt jwt;
+    @Value("${plugins.demo-features.auth.type}")
     private Type type;
+    @Value("${plugins.demo-features.auth.password}")
     private Password password;
+    @Value("${plugins.demo-features.auth.public-routes}")
     private List<String> publicRoutes;
 
     public Jwt getJwt() {
@@ -51,10 +56,15 @@ public class AuthProperties {
     }
 
     public static class Jwt {
+        @Value("${plugins.demo-features.auth.jwt.token-validity}")
         private long tokenValidity;
+        @Value("${plugins.demo-features.auth.jwt.signing-key}")
         private String signingKey;
+        @Value("${plugins.demo-features.auth.jwt.authorities-key}")
         private String authoritiesKey;
+        @Value("${plugins.demo-features.auth.jwt.token-prefix}")
         private String tokenPrefix;
+        @Value("${plugins.demo-features.auth.jwt.header-string}")
         private String headerString;
 
         public long getTokenValidity() {
