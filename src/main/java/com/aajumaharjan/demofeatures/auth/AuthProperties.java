@@ -54,15 +54,15 @@ public class AuthProperties {
     }
 
     public static class Jwt {
-        @Value("${plugins.demo-features.auth.jwt.token-validity}")
+        @Value("${plugins.demo-features.auth.jwt.token.validity}")
         private long tokenValidity;
-        @Value("${plugins.demo-features.auth.jwt.signing-key}")
+        @Value("${plugins.demo-features.auth.jwt.signing.key}")
         private String signingKey;
-        @Value("${plugins.demo-features.auth.jwt.authorities-key}")
+        @Value("${plugins.demo-features.auth.jwt.authorities.key}")
         private String authoritiesKey;
-        @Value("${plugins.demo-features.auth.jwt.token-prefix}")
+        @Value("${plugins.demo-features.auth.jwt.token.prefix}")
         private String tokenPrefix;
-        @Value("${plugins.demo-features.auth.jwt.header-string}")
+        @Value("${plugins.demo-features.auth.jwt.header.string}")
         private String headerString;
 
         public long getTokenValidity() {
