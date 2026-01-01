@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @ComponentScan(basePackages = "com.aajumaharjan.demofeatures.auth")
-@EnableJpaRepositories(basePackages = "com.aajumaharjan.demofeatures.auth.repository")
 @EntityScan(basePackages = "com.aajumaharjan.demofeatures.auth.model")
 @EnableConfigurationProperties(AuthProperties.class)
 public class AuthFeatureConfiguration {
