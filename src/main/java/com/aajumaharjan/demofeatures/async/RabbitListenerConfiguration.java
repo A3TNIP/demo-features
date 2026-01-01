@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnClass(EnableRabbit.class)
-@ConditionalOnProperty(prefix = "plugins.demo-features.async", name = "provider", havingValue = "RABBITMQ")
+@ConditionalOnProperty(prefix = "plugins.demo-features.async", name = "enabled", matchIfMissing = true)
 @EnableRabbit
 public class RabbitListenerConfiguration {
-    // Enables @RabbitListener for host applications when provider=RABBITMQ and amqp classes are present
+    // Enables @RabbitListener for host applications when async is enabled and AMQP classes are present
 }
