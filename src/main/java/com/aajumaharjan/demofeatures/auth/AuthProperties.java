@@ -10,13 +10,11 @@ import java.util.List;
 @ConfigurationProperties(prefix = "plugins.demo-features.auth")
 public class AuthProperties {
 
-    @Value("${plugins.demo-features.auth.jwt}")
     private Jwt jwt;
     @Value("${plugins.demo-features.auth.type}")
     private Type type;
-    @Value("${plugins.demo-features.auth.password}")
     private Password password;
-    @Value("${plugins.demo-features.auth.public-routes}")
+    @Value("${plugins.demo-features.auth.public-routes:}")
     private List<String> publicRoutes;
 
     public Jwt getJwt() {
