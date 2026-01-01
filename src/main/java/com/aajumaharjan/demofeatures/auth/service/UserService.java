@@ -55,6 +55,8 @@ public class UserService implements UserDetailsService {
         Set<Role> roles = new HashSet<>(roleRepository.findByNameIn(registerDto.getRoles()));
         user.setRoles(roles);
 
-        return userRepository.save(user);
+        var saved = userRepository.save(user);
+        saved.setPassword(null);
+        return saved;
     }
 }
