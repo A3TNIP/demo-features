@@ -43,7 +43,6 @@ public class RabbitAsyncMessagingClient extends AbstractAsyncMessagingClient imp
         container.setQueueNames(destination);
         container.setMessageListener((ChannelAwareMessageListener) (message, channel) -> {
             handler.accept(convert(message, type));
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         });
         container.start();
         log.info("RabbitMQ listener started for queue {}", destination);
