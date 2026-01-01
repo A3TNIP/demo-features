@@ -56,7 +56,11 @@ public class UserService implements UserDetailsService {
         user.setRoles(roles);
 
         var saved = userRepository.save(user);
-        saved.setPassword(null);
-        return saved;
+        UserEntity refreshed = new UserEntity();
+        refreshed.setId(saved.getId());
+        refreshed.setEmail(saved.getEmail());
+        refreshed.setName(saved.getName());
+        refreshed.setRoles(saved.getRoles());
+        return refreshed;
     }
 }
